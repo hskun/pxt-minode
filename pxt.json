@@ -1,6 +1,6 @@
 {
     "name": "minode",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "mi:node IoT Starter Kit - A micro:bit accessories Kit with 10 sensor modules for IoT node applications",
     "license": "MIT",
     "dependencies": {
@@ -14,6 +14,8 @@
         "libs/MiNodeComponent.cpp",
         "libs/MiNodeConn.h",
         "libs/MiNodeConn.cpp",
+        "libs/MiNodeCompat.cpp",
+        "libs/MiNodeCompat.h",
         "libs/MiNodeIO.h",
         "libs/MiNodeIO.cpp",
         "libs/MiNodeModulePool.h",

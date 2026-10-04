@@ -11,6 +11,10 @@
 #include "MicroBitDisplay.h"
 #include "MicroBitSystemTimer.h"
 
+#if MICROBIT_CODAL
+#include "MiNodeCompat.h"
+#endif
+
 #define MINODE_MIC_EVT_NOISE                  1
 
 #define MINODE_MIC_NOISE_THRESHOLD            50
@@ -43,8 +47,14 @@ class MiNodeMIC : public MiNodeComponent
     ~MiNodeMIC();
 
   private:
+#if MICROBIT_CODAL
+    MicroBitPin* pin;
+#else
     AnalogIn* pin;
     Ticker timer;
+#endif
+
+    void onTimerEvent(MicroBitEvent evt);
 
 };
 

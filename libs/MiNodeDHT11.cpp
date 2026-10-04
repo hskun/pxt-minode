@@ -1,19 +1,33 @@
 #include "MiNodeDHT11.h"
 
+#if MICROBIT_CODAL
+namespace {
+void waitForMs(int milliseconds)
+{
+  codal::system_timer_wait_ms(milliseconds);
+}
+}
+#else
+#define MINODE_SYSTEM_TIMER_ADD_COMPONENT(component) system_timer_add_component(component)
+#define MINODE_SYSTEM_TIMER_REMOVE_COMPONENT(component) system_timer_remove_component(component)
+#define waitForMs(milliseconds) wait_ms(milliseconds)
+#endif
 
 MiNodeDHT::MiNodeDHT() :
 pin(NULL),currentTem(-99)
 {
   this->baseId = MINODE_ID_MODULE_DHT11;
-  system_timer_add_component(this);
+  MINODE_SYSTEM_TIMER_ADD_COMPONENT(this);
 }
 
 MiNodeDHT::~MiNodeDHT()
 {
+#if !MICROBIT_CODAL
   if(pin) {
     delete pin;
   }
-  system_timer_remove_component(this);
+#endif
+  MINODE_SYSTEM_TIMER_REMOVE_COMPONENT(this);
 }
 
 void MiNodeDHT::attach(ConnName connName)
@@ -23,24 +37,36 @@ void MiNodeDHT::attach(ConnName connName)
   }
 
   MiNodeComponent::initConnector(connName);
+#if MICROBIT_CODAL
+  pin = minode::getMicroBitPin(this->cn);
+#else
   PinName pinName = MiNodeConn::calcP0Name(this->cn);
   if(pin) {
     delete pin;
   }
   pin = new DigitalInOut(pinName);
+#endif
 }
 
 void MiNodeDHT::dhtSet(int level)
 {
+#if MICROBIT_CODAL
+  minode::pinSetDigitalValue(pin, level);
+#else
   pin->output();
   pin->mode(PullNone);
   pin->write(level);
+#endif
 }
 
 int MiNodeDHT::dhtGet()
 {
+#if MICROBIT_CODAL
+  return minode::pinGetDigitalValue(pin);
+#else
   pin->input();
   return pin->read();
+#endif
 }
 
 int MiNodeDHT::whileGet(int v)
@@ -61,7 +87,7 @@ void MiNodeDHT::dhtStart()
     dhtSet(1);
     delay60US();
     dhtSet(0);
-    wait_ms(25);
+    waitForMs(25);
     dhtSet(1);
 }
 
@@ -189,6 +215,3 @@ int MiNodeDHT::getHumidity()
   }
   return Humidity;
 }
-
-
-

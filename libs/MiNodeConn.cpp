@@ -1,10 +1,78 @@
 #include "MiNodeConn.h"
 
-MiNodeConn::MiNodeConn(int id, PinName p0, PinName p1) :
-  P0 (id, p0, PIN_CAPABILITY_ALL),
-  P1 (id + 1, p1, PIN_CAPABILITY_ALL)
-{
+#if MICROBIT_CODAL
+#include "pxt.h"
 
+MicroBitPin* minodeGetPin(ConnName name)
+{
+  switch(name) {
+    case A0:
+      return pxt::getPin(MICROBIT_ID_IO_P0);
+    case A1:
+      return pxt::getPin(MICROBIT_ID_IO_P1);
+    case A2:
+      return pxt::getPin(MICROBIT_ID_IO_P2);
+    case D12:
+      return pxt::getPin(MICROBIT_ID_IO_P12);
+    case D13:
+      return pxt::getPin(MICROBIT_ID_IO_P13);
+    case D14:
+      return pxt::getPin(MICROBIT_ID_IO_P14);
+    case D15:
+      return pxt::getPin(MICROBIT_ID_IO_P15);
+    default:
+      return NULL;
+  }
+}
+
+MicroBitPin* minodeGetPin(AnalogConnName name)
+{
+  switch(name) {
+    case Analog_A0:
+      return pxt::getPin(MICROBIT_ID_IO_P0);
+    case Analog_A1:
+      return pxt::getPin(MICROBIT_ID_IO_P1);
+    case Analog_A2:
+      return pxt::getPin(MICROBIT_ID_IO_P2);
+    default:
+      return NULL;
+  }
+}
+
+MicroBitPin* minodeGetSecondPin(ConnName name)
+{
+  switch(name) {
+    case A0:
+      return pxt::getPin(MICROBIT_ID_IO_P1);
+    case A1:
+      return pxt::getPin(MICROBIT_ID_IO_P2);
+    case A2:
+      return pxt::getPin(MICROBIT_ID_IO_P3);
+    case D12:
+      return pxt::getPin(MICROBIT_ID_IO_P13);
+    case D13:
+      return pxt::getPin(MICROBIT_ID_IO_P14);
+    case D14:
+      return pxt::getPin(MICROBIT_ID_IO_P15);
+    case D15:
+      return pxt::getPin(MICROBIT_ID_IO_P16);
+    default:
+      return NULL;
+  }
+}
+#endif
+
+#if !MICROBIT_CODAL
+MiNodeConn::MiNodeConn(int id, PinName p0, PinName p1) :
+  P0 (id, p0, PIN_CAPABILITY_ALL), P1 (id + 1, p1, PIN_CAPABILITY_ALL)
+{
+#else
+MiNodeConn::MiNodeConn(int id, PinName p0, PinName p1)
+{
+  (void)id;
+  (void)p0;
+  (void)p1;
+#endif
 }
 
 void MiNodeConn::calcPinName(ConnName name, PinName* p0, PinName* p1)

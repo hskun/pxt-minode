@@ -11,6 +11,10 @@
 #include "MicroBitDisplay.h"
 #include "MicroBitSystemTimer.h"
 
+#if MICROBIT_CODAL
+#include "MiNodeCompat.h"
+#endif
+
 #define MINODE_ROTARY_EVT_CHANGE                  1
 
 class MiNodeRotary : public MiNodeComponent
@@ -29,7 +33,11 @@ public:
   ~MiNodeRotary();
 
 private:
+#if MICROBIT_CODAL
+  MicroBitPin* pin;
+#else
   AnalogIn* pin;
+#endif
   int currentAD;
   int count;
   

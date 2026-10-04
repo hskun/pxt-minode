@@ -1,5 +1,6 @@
 #include "MiNodeRGB.h"
 
+
 MiNodeRGB::MiNodeRGB() :
 CLOCK(NULL) , DATA(NULL)
 {
@@ -8,6 +9,7 @@ CLOCK(NULL) , DATA(NULL)
 
 MiNodeRGB::~MiNodeRGB()
 {
+#if !MICROBIT_CODAL
   if(CLOCK) {
     delete CLOCK;
   }
@@ -15,6 +17,7 @@ MiNodeRGB::~MiNodeRGB()
   if(DATA) {
     delete DATA;
   }
+#endif
 }
 
 void MiNodeRGB::attach(ConnName connName)
@@ -25,6 +28,10 @@ void MiNodeRGB::attach(ConnName connName)
 
   MiNodeComponent::initConnector(connName);
 
+#if MICROBIT_CODAL
+  CLOCK = minode::getMicroBitPin(this->cn);
+  DATA = minode::getSecondPin(this->cn);
+#else
   PinName pinName1 = MiNodeConn::calcP0Name(this->cn);
   PinName pinName2 = MiNodeConn::calcP1Name(this->cn);
   if(CLOCK) {
@@ -32,20 +39,32 @@ void MiNodeRGB::attach(ConnName connName)
   }
   CLOCK = new DigitalOut(pinName1);
   DATA = new DigitalOut(pinName2);
+#endif
 }
 
 void MiNodeRGB::rgbClockWrite(int value)
 {
+#if MICROBIT_CODAL
+  minode::pinSetDigitalValue(CLOCK, value);
+#else
   CLOCK->write(value);
+#endif
 }
 
 void MiNodeRGB::rgbDataWrite(int value)
 {
+#if MICROBIT_CODAL
+  minode::pinSetDigitalValue(DATA, value);
+#else
   DATA->write(value);
+#endif
 }
 
 void MiNodeRGB::rgbDelay()
 {
+#if MICROBIT_CODAL
+  codal::system_timer_wait_us(1);
+#endif
 
 }
 
@@ -160,4 +179,3 @@ void MiNodeRGB::rgbWrite(uint8_t r,uint8_t g,uint8_t b)
       rgbClockWrite(0);
   }
 }
-

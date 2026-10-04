@@ -1,18 +1,25 @@
 #include "MiNodeLightSensor.h"
 
+#if !MICROBIT_CODAL
+#define MINODE_SYSTEM_TIMER_ADD_COMPONENT(component) system_timer_add_component(component)
+#define MINODE_SYSTEM_TIMER_REMOVE_COMPONENT(component) system_timer_remove_component(component)
+#endif
+
 MiNodeLight::MiNodeLight() :
 pin(NULL),sigma(0),pre_status(MICROBIT_LIGHT_LEVEL_NULL)
 {
   this->baseId = MINODE_ID_MODULE_LIGHT;
-  system_timer_add_component(this);
+  MINODE_SYSTEM_TIMER_ADD_COMPONENT(this);
 }
 
 MiNodeLight::~MiNodeLight()
 {
+#if !MICROBIT_CODAL
   if(pin) {
     delete pin;
   }
-  system_timer_remove_component(this);
+#endif
+  MINODE_SYSTEM_TIMER_REMOVE_COMPONENT(this);
 }
 
 
@@ -24,17 +31,25 @@ void MiNodeLight::attach(AnalogConnName connName)
 
   MiNodeComponent::initAConnector(connName);
 
+#if MICROBIT_CODAL
+  pin = minode::getMicroBitPin(this->cna);
+#else
   PinName pinName = MiNodeConn::calcP0Name(this->cna);
   if(pin) {
     delete pin;
   }
   pin = new AnalogIn(pinName);
+#endif
 
 }
 
 unsigned short MiNodeLight::getLight()
 {
+#if MICROBIT_CODAL
+  return minode::pinGetAnalogValue(pin);
+#else
   return pin->read_u16();
+#endif
 }
 
 unsigned short MiNodeLight::getLightLevel(void)
@@ -94,5 +109,3 @@ void MiNodeLight::systemTick()
     }
   }
 }
-
-

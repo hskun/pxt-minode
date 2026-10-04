@@ -11,6 +11,10 @@
 #include "MicroBitDisplay.h"
 #include "MicroBitSystemTimer.h"
 
+#if MICROBIT_CODAL
+#include "MiNodeCompat.h"
+#endif
+
 enum MiNodeColor
 {
   //% block="Red" enumval=0
@@ -42,8 +46,13 @@ public:
   ~MiNodeRGB();
 
 private:
+#if MICROBIT_CODAL
+  MicroBitPin* CLOCK;
+  MicroBitPin* DATA;
+#else
   DigitalOut* CLOCK;
   DigitalOut* DATA;
+#endif
 
   unsigned int rgbHEX;
 

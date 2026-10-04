@@ -8,6 +8,9 @@
 #include "MicroBitEvent.h"
 #include "MiNodeComponent.h"
 #include "MiNodeConn.h"
+#if MICROBIT_CODAL
+#include "MiNodeCompat.h"
+#endif
 #include "MicroBitDisplay.h"
 #include "MicroBitSystemTimer.h"
 
@@ -33,7 +36,11 @@ public:
   void fanClose();
 
 private:
+#if MICROBIT_CODAL
+  MicroBitPin* pin;
+#else
   DigitalOut* pin;
+#endif
 };
 
 #endif

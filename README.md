@@ -54,7 +54,7 @@ MIT
 
 ## Supported targets
 
-* for PXT/microbit
+* for PXT/microbit (micro:bit V1 and V2, including V2.21)
 (The metadata above is needed for package search.)
 
 ```package

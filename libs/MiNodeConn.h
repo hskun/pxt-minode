@@ -1,9 +1,11 @@
 #ifndef MINODE_CONN_H
 #define MINODE_CONN_H
 
-#include "mbed.h"
 #include "MicroBitConfig.h"
+#include "mbed.h"
+#if !MICROBIT_CODAL
 #include "MicroBitPin.h"
+#endif
 
 enum ConnName
 {
@@ -37,14 +39,21 @@ enum AnalogConnName
   Analog_MN_NC = -1
 };
 
+#if MICROBIT_CODAL
+MicroBitPin* minodeGetPin(ConnName name);
+MicroBitPin* minodeGetPin(AnalogConnName name);
+MicroBitPin* minodeGetSecondPin(ConnName name);
+#endif
+
 class MiNodeConn
 {
 
 public:
-
+#if !MICROBIT_CODAL
   MicroBitPin      pin[0];
   MicroBitPin          P0;
   MicroBitPin          P1;
+#endif
 
   MiNodeConn(int id, PinName p0, PinName p1);
 

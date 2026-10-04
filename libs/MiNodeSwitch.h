@@ -7,6 +7,10 @@
 #include "MicroBitEvent.h"
 #include "MiNodeComponent.h"
 
+#if MICROBIT_CODAL
+#include "MiNodeCompat.h"
+#endif
+
 
 enum SwitchEvent
 {
@@ -29,11 +33,20 @@ public:
 
 
 private:
+#if MICROBIT_CODAL
+  void onOpenEvent(MicroBitEvent evt);
+  void onCloseEvent(MicroBitEvent evt);
+#else
   void onOpen();
   void onClose();
+#endif
   void eventOn();
 
+#if MICROBIT_CODAL
+  MicroBitPin* pin;
+#else
   InterruptIn* pin;
+#endif
 };
 
 #endif

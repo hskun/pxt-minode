@@ -11,6 +11,10 @@
 #include "MicroBitDisplay.h"
 #include "MicroBitSystemTimer.h"
 
+#if MICROBIT_CODAL
+#include "MiNodeCompat.h"
+#endif
+
 #define MINODE_DHT_EVT_CHANGE                  1
 #define TIME_TH 		                       10000
 
@@ -21,6 +25,9 @@ enum DHTTemStyle {
   MINODE_FAN_FAHRENHEIT = 2,
 };
 
+#if MICROBIT_CODAL
+#define delay60US() codal::system_timer_wait_us(60)
+#else
 #define delay60US()\
 t++;t++;t++;t++;t++;t++;t++;t++;t++;t++;\
 t++;t++;t++;t++;t++;t++;t++;t++;t++;t++;\
@@ -35,7 +42,8 @@ t++;t++;t++;t++;t++;t++;t++;t++;t++;t++;\
 t++;t++;t++;t++;t++;t++;t++;t++;t++;t++;\
 t++;t++;t++;t++;t++;t++;t++;t++;t++;t++;\
 t++;t++;t++;t++;t++;t++;t++;t++;t++;t++;\
-t++;t++;t++;t++;t++;t++;t++;t++;t++;t++;\
+t++;t++;t++;t++;t++;t++;t++;t++;t++;t++;
+#endif
 
 class MiNodeDHT : public MiNodeComponent
 {
@@ -51,7 +59,11 @@ class MiNodeDHT : public MiNodeComponent
     ~MiNodeDHT();
 
   private:
+#if MICROBIT_CODAL
+    MicroBitPin*  pin;
+#else
     DigitalInOut*  pin;
+#endif
 
     int Humidity;
     int Temperature;
@@ -73,4 +85,3 @@ class MiNodeDHT : public MiNodeComponent
 };
 
 #endif
-

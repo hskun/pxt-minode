@@ -9,6 +9,10 @@
 #include "MiNodeConn.h"
 #include "MicroBitSystemTimer.h"
 
+#if MICROBIT_CODAL
+#include "MiNodeCompat.h"
+#endif
+
 
 #define MINODE_LIGHT_EVT_LEVEL_CHANGE          1
 
@@ -47,7 +51,11 @@ class MiNodeLight : public MiNodeComponent
 	   ~MiNodeLight();
 
 	private:
+#if MICROBIT_CODAL
+	  MicroBitPin* pin;
+#else
 	  AnalogIn* pin;
+#endif
 	  int sigma;
 		int pre_status;
 };

@@ -1,5 +1,6 @@
 #include "MiNodePIR.h"
 
+
 MiNodePIR::MiNodePIR() :
 pin(NULL)
 {
@@ -8,9 +9,11 @@ pin(NULL)
 
 MiNodePIR::~MiNodePIR()
 {
+#if !MICROBIT_CODAL
   if(pin) {
     delete pin;
   }
+#endif
 }
 
 void MiNodePIR::attach(ConnName connName)
@@ -21,6 +24,11 @@ void MiNodePIR::attach(ConnName connName)
 
   MiNodeComponent::initConnector(connName);
 
+#if MICROBIT_CODAL
+  pin = minode::getMicroBitPin(this->cn);
+  minode::pinSetPullNone(pin);
+  minode::pinOnRise(pin, this, &MiNodePIR::onTriggerEvent);
+#else
   PinName pinName = MiNodeConn::calcP0Name(this->cn);
   if(pin) {
     delete pin;
@@ -28,6 +36,7 @@ void MiNodePIR::attach(ConnName connName)
   pin = new InterruptIn(pinName);
   pin->mode(PullNone);
   pin->rise(this, &MiNodePIR::onTrigger);
+#endif
 }
 
 int MiNodePIR::isTriged()
@@ -46,15 +55,24 @@ int MiNodePIR::isTriged()
     return 0;
 }
 
+#if MICROBIT_CODAL
+void MiNodePIR::onTriggerEvent(MicroBitEvent evt)
+{
+  (void)evt;
+  MicroBitEvent event(this->baseId + this->id,MINODE_PIR_EVT_TRIG);
+}
+#else
 void MiNodePIR::onTrigger()
 {
-  MicroBitEvent evt(this->baseId + this->id,MINODE_PIR_EVT_TRIG);
+  MicroBitEvent event(this->baseId + this->id,MINODE_PIR_EVT_TRIG);
 }
+#endif
 
 int MiNodePIR::readPir()
 {
-	return pin->read();
+#if MICROBIT_CODAL
+  return minode::pinGetDigitalValue(pin);
+#else
+  return pin->read();
+#endif
 }
-
-
-

@@ -1,18 +1,32 @@
 #include "MiNodeMIC.h"
 
+#if MICROBIT_CODAL
+#define MINODE_MIC_TIMER_ID 83
+#define MINODE_MIC_TIMER_VALUE 0
+#else
+#define MINODE_SYSTEM_TIMER_ADD_COMPONENT(component) system_timer_add_component(component)
+#define MINODE_SYSTEM_TIMER_REMOVE_COMPONENT(component) system_timer_remove_component(component)
+#endif
+
+
 MiNodeMIC::MiNodeMIC() :
 pin(NULL)
 {
   this->baseId = MINODE_ID_MODULE_LIGHT;
-  system_timer_add_component(this);
+  MINODE_SYSTEM_TIMER_ADD_COMPONENT(this);
 }
 
 MiNodeMIC::~MiNodeMIC()
 {
+#if MICROBIT_CODAL
+  detachTimer();
+#else
   if(pin) {
     delete pin;
   }
-  system_timer_remove_component(this);
+  timer.detach();
+#endif
+  MINODE_SYSTEM_TIMER_REMOVE_COMPONENT(this);
 }
 
 void MiNodeMIC::checking(void)
@@ -25,7 +39,11 @@ void MiNodeMIC::checking(void)
   static int tri_flag = 0;
   static int time_count = 0;
 
+#if MICROBIT_CODAL
+  current_ad = minode::pinGetAnalogValue(pin);
+#else
   current_ad = pin->read_u16();
+#endif
   if (current_ad > 528)
   {
     adHolder[ad_count%8] = current_ad - 528;
@@ -64,6 +82,14 @@ void MiNodeMIC::checking(void)
   }
 }
 
+#if MICROBIT_CODAL
+void MiNodeMIC::onTimerEvent(MicroBitEvent evt)
+{
+  (void)evt;
+  checking();
+}
+#endif
+
 void MiNodeMIC::attach(AnalogConnName connName)
 {
   if(this->cn != MN_NC) {
@@ -72,18 +98,29 @@ void MiNodeMIC::attach(AnalogConnName connName)
 
   MiNodeComponent::initAConnector(connName);
 
+#if MICROBIT_CODAL
+  pin = minode::getMicroBitPin(this->cna);
+#else
   PinName pinName = MiNodeConn::calcP0Name(this->cna);
   if(pin) {
     delete pin;
   }
   pin = new AnalogIn(pinName);
+#endif
 
+#if MICROBIT_CODAL
+  uBit.messageBus.listen(MINODE_MIC_TIMER_ID, MINODE_MIC_TIMER_VALUE, this, &MiNodeMIC::onTimerEvent);
+  codal::system_timer_event_every_us(500, MINODE_MIC_TIMER_ID, MINODE_MIC_TIMER_VALUE);
+#else
   timer.attach_us(this, &MiNodeMIC::checking, 500);
+#endif
 }
 
 void MiNodeMIC::detachTimer()
 {
+#if MICROBIT_CODAL
+  codal::system_timer_cancel_event(MINODE_MIC_TIMER_ID, MINODE_MIC_TIMER_VALUE);
+#else
   timer.detach();
+#endif
 }
-
-
