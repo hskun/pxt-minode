@@ -1,3 +1,5 @@
+# fork updated: Micro:bit V2-compatible development board.
+
 # pxt-minode
 
 mi:node Kit(micro:bit accessories by [Embest](http://www.embest-tech.com/)) driver package for [JavaScript Blocks Editor / makecode.microbit.org](https://makecode.microbit.org)
